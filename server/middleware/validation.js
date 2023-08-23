@@ -1,3 +1,7 @@
+const { validationResult } = require('express-validator');
+const logger = require('./logger');
+const { HTTP_STATUS } = require('../utils/constantsAndFunctions');
+
 // Fonction pour vérifier les erreurs de validation et renvoyer une réponse en cas d'erreur
 function validationCheck(req, res) {
   const errors = validationResult(req);
@@ -7,4 +11,4 @@ function validationCheck(req, res) {
   }
 } 
 
-module.exports = validationCheck;
+module.exports = { validationCheck };
