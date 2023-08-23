@@ -1,5 +1,5 @@
 const cache = require('memory-cache');
-const { defaultOffset, defaultLimit } = require('../../config/config');
+const { defaultOffset, defaultLimit, cacheExpirationInMilliseconds } = require('../../config/config');
 const logger = require('../../middleware/logger');
 const { HTTP_STATUS, SERVER_WITH_PORT_REGEX } = require('../../utils/constantsAndFunctions');
 const ServerServices = require('./services');
@@ -22,7 +22,7 @@ const ServerController = {
 
       if (cachedServers) {
         cachedServers.push({ host: host, port: port });
-        cache.put(cachedKey, cachedServers, 60000); // Update cache for 1 minute
+        cache.put(cachedKey, cachedServers, cacheExpirationInMilliseconds);
       }
 
       res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', host: host });
@@ -45,7 +45,7 @@ const ServerController = {
 
         if (cachedServers) {
           const updatedCachedServers = cachedServers.filter(s => s.host !== host || s.port !== port);
-          cache.put(cachedKey, updatedCachedServers, 60000); // Update cache for 1 minute
+          cache.put(cachedKey, updatedCachedServers, cacheExpirationInMilliseconds);
         }
 
         res.status(HTTP_STATUS.ACCEPTED).json({ message: 'Server deleted', deletedCount: result });
@@ -73,7 +73,7 @@ const ServerController = {
       }
 
       const result = await ServerServices.getServers(offset, limit);
-      cache.put(cacheKey, result, 60000); // Cache the result for 1 minute
+      cache.put(cacheKey, result, cacheExpirationInMilliseconds);
       res.status(HTTP_STATUS.OK).json(result);
       
       logger.info("Server list sent.");
@@ -84,8 +84,8 @@ const ServerController = {
   },
 
   async getServer(req, res) {
-    logger.info(`Received request for server data: ${serverAddressWithPort}`);
     const serverAddressWithPort = req.params.server_address_with_port;
+    logger.info(`Received request for server data: ${serverAddressWithPort}`);
 
     if (!serverAddressWithPort.match(SERVER_WITH_PORT_REGEX)) {
       logger.warn(`Invalid server address: ${serverAddressWithPort}`);
@@ -95,19 +95,28 @@ const ServerController = {
     const [serverAddress, serverPort] = serverAddressWithPort.split(':');
     const server = { host: serverAddress, port: Number.parseInt(serverPort) || 25565 };
 
+    const cachedKey = `server_${serverAddressWithPort}`;
+    const cachedServerData = cache.get(cachedKey);
+
+    if (cachedServerData) {
+      logger.info(`Data retrieved from cache for server: ${serverAddressWithPort}`);
+      return res.status(HTTP_STATUS.OK).json(cachedServerData);
+    }
+
     try {
-      const serverData = await ServerServices.getServer(server.host, server.port);
+      const serverData = await ServerServices.getServer(server);
   
       if (!serverData) {
         logger.warn(`Server not registered: ${serverAddressWithPort}`);
-        res.status(HTTP_STATUS.NOT_FOUND).json({ 'Error': `'${serverAddressWithPort}' is not registered in our database!` });
+        res.status(HTTP_STATUS.NOT_FOUND).json({ 'Error': `Failed to find recorded data for '${serverAddressWithPort}' in our database!` });
       } else {
+        cache.put(cachedKey, serverData, cacheExpirationInMilliseconds);
         logger.info(`Data retrieved for server: ${serverAddressWithPort}`);
         res.status(HTTP_STATUS.OK).json(serverData);
       }
     } catch (error) {
       logger.error(`Failed to retrieve data for server: ${serverAddressWithPort}`, error);
-      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 'Error': 'Failed to fetch server data' });
+      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 'Error': 'Failed to retrieve server data' });
     }
   }
 }
