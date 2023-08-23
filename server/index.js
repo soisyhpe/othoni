@@ -10,8 +10,6 @@ logger.info("Starting application...");
 // Initialize .env
 function initEnvironment() {
   require('dotenv').config();
-  logger.info(process.env.PORT);
-  logger.info(process.env.MONGO_URI);
 }
 
 // Initialize configuration
