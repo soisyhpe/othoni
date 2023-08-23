@@ -1,5 +1,6 @@
 const SERVER_ADDRESS_REGEX = /^((\w){1,}\.)?\w*\.(\w){2,}$/;
 const SERVER_WITH_PORT_REGEX = /^((\w){1,}\.)?\w*\.(\w){2,}(:\d{5,5})?$/;
+const USER_PASSWORD_REGEX = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/;
 const HTTP_STATUS = {
   BAD_REQUEST: 400,
   UNAUTHORIZED: 401,
@@ -17,5 +18,6 @@ const HTTP_STATUS = {
 module.exports = {
   SERVER_ADDRESS_REGEX,
   SERVER_WITH_PORT_REGEX,
+  USER_PASSWORD_REGEX,
   HTTP_STATUS
 };
