@@ -1,3 +1,4 @@
+const SERVER_ADDRESS_REGEX = /^((\w){1,}\.)?\w*\.(\w){2,}$/;
 const SERVER_WITH_PORT_REGEX = /^((\w){1,}\.)?\w*\.(\w){2,}(:\d{5,5})?$/;
 const HTTP_STATUS = {
   BAD_REQUEST: 400,
@@ -14,6 +15,7 @@ const HTTP_STATUS = {
 };
 
 module.exports = {
+  SERVER_ADDRESS_REGEX,
   SERVER_WITH_PORT_REGEX,
   HTTP_STATUS
 };
