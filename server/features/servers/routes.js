@@ -1,13 +1,15 @@
 const express = require('express');
-const serverController = require('./controller');
+const ServerController = require('./controller');
 
 const {
   verifyToken
-} = require('../../utils/constantsAndFunctions');
+} = require('../../middleware/token');
 
 const router = express.Router();
 
-router.get("/:server_address_with_port", verifyToken, serverController.getServer);
-router.get("/", verifyToken, serverController.getServers);
+router.post('', verifyToken, ServerController.addServer);
+router.delete('/:server_address_with_port', verifyToken, ServerController.deleteServer);
+router.get('', verifyToken, ServerController.getServers);
+router.get('/:server_address_with_port', verifyToken, ServerController.getServer);
 
 module.exports = router;

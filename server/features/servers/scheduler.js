@@ -13,6 +13,7 @@ function scheduleTask() {
   setTimeout(() => {
     logger.info('Executing data fetching task...');
     fetchServersData();
+    // TO-DO : push data to database
     logger.info('Data fetching task executed.');
     
     scheduleTask();
