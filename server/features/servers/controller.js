@@ -2,15 +2,20 @@ const cache = require('memory-cache');
 const { check, param, validationResult } = require('express-validator');
 const { defaultOffset, defaultLimit, cacheExpirationInMilliseconds } = require('../../config/config');
 const logger = require('../../middleware/logger');
-const { HTTP_STATUS, SERVER_WITH_PORT_REGEX } = require('../../utils/constantsAndFunctions');
+const { validationCheck } = require('../../middleware/validation');
+const { SERVER_ADDRESS_REGEX, SERVER_WITH_PORT_REGEX, HTTP_STATUS } = require('../../utils/constantsAndFunctions');
 const ServerServices = require('./services');
 
 const ServerController = {
 
   // Validation des données pour l'ajout d'un serveur
   addServerValidations: [
-    check('host').notEmpty().withMessage('Host is required'),
-    check('port').notEmpty().withMessage('Port is required')
+    check('host')
+      .notEmpty().withMessage('Host is required')
+      .matches(SERVER_ADDRESS_REGEX).withMessage('Invalid server host'),
+    check('port')
+      .notEmpty().withMessage('Port is required')
+      .isInt({ min: 0, max: 65535 }).withMessage('Port must be a valid number between 0 and 65535')
   ],
 
   // Ajout d'un serveur
@@ -19,27 +24,28 @@ const ServerController = {
 
     validationCheck(req, res);
 
-    const { host, port } = req.body;
+    const server = req.body;
 
     try {
-      await ServerServices.addServer({ host: host, port: port });
+      await ServerServices.addServer(server);
 
       const cachedKey = `servers_${defaultOffset}_${defaultLimit}`;
       const cachedServers = cache.get(cachedKey);
 
       if (cachedServers) {
-        cachedServers.push({ host: host, port: port });
+        cachedServers.push(server);
         cache.put(cachedKey, cachedServers, cacheExpirationInMilliseconds);
-        logger.debug(`Added server to cache: ${host}:${port}`);
+        logger.debug(`Added server to cache: ${server.host}:${server.port}`);
       }
 
-      res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', host: host });
+      res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', server });
     } catch (error) {
       if (error.code === 11000) {
         logger.error('Duplicate key error:', error);
         res.status(HTTP_STATUS.CONFLICT).json({ error: 'Server already exists' });
       } else {
-        logger.error('Unable to add server:', error);
+        logger.error(`Unable to add server: ${server.host}:${server.port}`);
+        logger.debug(`Error details:`, error);
         res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Server addition failed' });
       }
     }
@@ -149,14 +155,5 @@ const ServerController = {
     }
   }
 };
-
-// Fonction pour vérifier les erreurs de validation et renvoyer une réponse en cas d'erreur
-function validationCheck(req, res) {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    logger.debug('Validation errors:', errors.array());
-    return res.status(HTTP_STATUS.BAD_REQUEST).json({ errors: errors.array() });
-  }
-} 
 
 module.exports = ServerController;
