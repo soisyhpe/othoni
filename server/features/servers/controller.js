@@ -111,7 +111,8 @@ const ServerController = {
 
       logger.info("Server list sent.");
     } catch (error) {
-      logger.error('Failed to get server list:', error);
+      logger.error('Failed to get server list.');
+      logger.debug(`Error details:`, error);
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Failed to get servers' });
     }
   },
@@ -150,7 +151,8 @@ const ServerController = {
         res.status(HTTP_STATUS.OK).json(serverData);
       }
     } catch (error) {
-      logger.error(`Failed to retrieve data for server: ${serverAddressWithPort}`, error);
+      logger.error(`Failed to retrieve data for server: ${serverAddressWithPort}`);
+      logger.debug(`Error details:`, error);
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ 'Error': 'Failed to retrieve server data' });
     }
   }
