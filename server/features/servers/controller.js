@@ -35,12 +35,15 @@ const ServerController = {
 
       res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', host: host });
     } catch (error) {
-      logger.error('Unable to add server:', error);
-      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Server addition failed' });
+      if (error.code === 11000) {
+        logger.error('Duplicate key error:', error);
+        res.status(HTTP_STATUS.CONFLICT).json({ error: 'Server already exists' });
+      } else {
+        logger.error('Unable to add server:', error);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Server addition failed' });
+      }
     }
   },
-
-  // ...
 
   // Suppression d'un serveur
   deleteServerValidations: [
@@ -78,8 +81,6 @@ const ServerController = {
     }
   },
 
-  // ...
-
   // Récupération des serveurs
   async getServers(req, res) {
     logger.info("Received request for server list.");
@@ -108,8 +109,6 @@ const ServerController = {
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Failed to get servers' });
     }
   },
-
-  // ...
 
   // Récupération d'un serveur
   getServerValidations: [
