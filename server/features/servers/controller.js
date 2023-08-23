@@ -18,7 +18,7 @@ const ServerController = {
     }
 
     try {
-      const result = await ServerServices.addServer({ host: host, port: port });
+      await ServerServices.addServer({ host: host, port: port });
       res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', host: host });
     } catch (error) {
       logger.error('Unable to add server:', error);
@@ -46,7 +46,10 @@ const ServerController = {
   async getServers(req, res) {
     try {
       logger.info("Received request for server list.");
-      const result = await ServerServices.getServers();
+      const offset = req.params.offset || 0;
+      const limit = req.params.limit || 10;
+
+      const result = await ServerServices.getServers(offset, limit);
       res.status(HTTP_STATUS.OK).json(result);
       logger.info("Server list sent.");
     } catch (error) {
