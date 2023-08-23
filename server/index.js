@@ -15,7 +15,7 @@ function initEnvironment() {
 // Initialize configuration
 function initConfig() {
   const config = require('./config/config');
-  if (!config.port || !config.fetchInterval) {
+  if (!config.fetchInterval) {
     logger.error('Configuration values are missing.');
     process.exit(1);
   } else {
