@@ -10,6 +10,8 @@ logger.info("Starting application...");
 // Initialize .env
 function initEnvironment() {
   require('dotenv').config();
+  logger.info(process.env.PORT);
+  logger.info(process.env.MONGO_URI);
 }
 
 // Initialize configuration
@@ -58,8 +60,9 @@ function initErrorHandler() {
 
 // Start the server
 function startServer() {
-  app.listen(process.env.PORT, () => {
-    logger.info(`Server is running on port ${process.env.PORT}`);
+  const port = process.env.PORT;
+  app.listen(port, () => {
+    logger.info(`Server is running on port ${port}`);
   });
 }
 
