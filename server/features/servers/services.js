@@ -1,4 +1,5 @@
 const logger = require('../../middleware/logger');
+const { serversCollection, monitoringCollection } = require('../../config/config');
 const { withDatabase } = require('../../utils/database');
 
 const ServerServices = {
@@ -6,7 +7,7 @@ const ServerServices = {
   async addServer(server) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('servers');
+        const collection = database.db.collection(serversCollection);
         const result = await collection.insertOne(server);
         logger.info(`Server ${server.host}:${server.port} added to the database`);
         return result.insertedId;
@@ -20,7 +21,7 @@ const ServerServices = {
   async deleteServer(server) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('servers');
+        const collection = database.db.collection(serversCollection);
         const result = await collection.deleteOne(server);
         
         if (result.deletedCount > 0) {
@@ -40,7 +41,7 @@ const ServerServices = {
   async getServers(offset = 0, limit = null) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('servers');
+        const collection = database.db.collection(serversCollection);
         const query = collection.find({}).skip(offset).limit(limit !== null ? limit : 0);
         const result = await query.toArray();
         logger.info(`Retrieved ${result.length} servers from the database`);
@@ -55,7 +56,7 @@ const ServerServices = {
   async recordServerActivity(server, player_count, date) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('monitoring');
+        const collection = database.db.collection(monitoringCollection);
         const document = { host: server.host, player_amount: player_count, date: date };
         const result = await collection.insertOne(document);
         logger.info(`Data inserted for server ${server.host}:${server.port}, ID: ${result.insertedId}`);
@@ -70,7 +71,7 @@ const ServerServices = {
   async getServer(server) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('monitoring');
+        const collection = database.db.collection(monitoringCollection);
         const result = await collection.find(server).toArray();
         
         if (result.length === 0) {

@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const { usersCollection } = require('../../config/config');
 const logger = require('../../middleware/logger');
 const { withDatabase } = require('../../utils/database');
 
@@ -27,7 +28,7 @@ const AuthenticationServices = {
   async createUser(username, password) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('users');
+        const collection = database.db.collection(usersCollection);
         const user = { username, password };
         await collection.insertOne(user);
         logger.info('User created:', username);
@@ -41,7 +42,7 @@ const AuthenticationServices = {
   async deleteUser(username) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('users');
+        const collection = database.db.collection(usersCollection);
         const result = await collection.deleteOne( { username: username } );
 
         if (result.deletedCount > 0) {
@@ -61,7 +62,7 @@ const AuthenticationServices = {
   async findUserByUsername(username) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('users');
+        const collection = database.db.collection(usersCollection);
         const user = await collection.findOne({ username });
         return user;
       });
@@ -74,7 +75,7 @@ const AuthenticationServices = {
   async getUsers(offset = 0, limit = null) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection('users');
+        const collection = database.db.collection(usersCollection);
         const query = collection.find({}).skip(offset).limit(limit !== null ? limit : 0);
         const result = await query.toArray();
         logger.info(`Retrieved ${result.length} users from the database`);

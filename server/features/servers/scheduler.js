@@ -1,5 +1,5 @@
-const logger = require('../../middleware/logger');
 const { fetchInterval } = require('../../config/config');
+const logger = require('../../middleware/logger');
 const { fetchServersData } = require('./fetcher');
 
 function scheduleTask() {
@@ -13,7 +13,6 @@ function scheduleTask() {
   setTimeout(() => {
     logger.info('Executing data fetching task...');
     fetchServersData();
-    // TO-DO : push data to database
     logger.info('Data fetching task executed.');
     
     scheduleTask();
