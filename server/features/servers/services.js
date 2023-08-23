@@ -37,11 +37,12 @@ const ServerServices = {
     }
   },
 
-  async getServers() {
+  async getServers(offset = 0, limit = null) {
     try {
       return await withDatabase(async (database) => {
         const collection = database.db.collection('servers');
-        const result = await collection.find({}).toArray();
+        const query = collection.find({}).skip(offset).limit(limit !== null ? limit : 0);
+        const result = await query.toArray();
         logger.info(`Retrieved ${result.length} servers from the database`);
         return result;
       });

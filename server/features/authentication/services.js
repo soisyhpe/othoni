@@ -71,11 +71,12 @@ const AuthenticationServices = {
     }
   },
 
-  async getUsers(offset = 10, limit = 0) {
+  async getUsers(offset = 0, limit = null) {
     try {
       return await withDatabase(async (database) => {
         const collection = database.db.collection('users');
-        const result = await collection.find({}).skip(offset).limit(limit).toArray();
+        const query = collection.find({}).skip(offset).limit(limit !== null ? limit : 0);
+        const result = await query.toArray();
         logger.info(`Retrieved ${result.length} users from the database`);
         return result;
       });
