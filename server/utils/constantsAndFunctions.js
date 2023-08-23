@@ -11,22 +11,8 @@ const HTTP_STATUS = {
   INTERNAL_SERVER_ERROR: 500,
   SERVICE_UNAVAILABLE: 503,
 };
-const servers = [ 
-  { host: 'mc.erisium.com', port: 25565 },
-  { host: 'play.craftok.fr', port: 25565 }, 
-  { host: 'funcraft.net', port: 25565 }, 
-  { host: 'mc.erisium.com', port: 25565 },
-  { host: 'funcraft.net', port: 25565 }, 
-  { host: 'play.rinaorc.com', port: 25565 },
-  { host: 'oneblockfrance.fr', port: 25565 },
-  { host: 'play.hypenetwork.fr', port: 25565 },
-  { host: 'mc.hypixel.net', port: 25565 },
-  { host: 'play.mccisland.net', port: 25565 },
-  { host: 'mc.uhcworld.fr', port: 25565 }
-];
 
 module.exports = {
   SERVER_WITH_PORT_REGEX,
-  HTTP_STATUS,
-  servers
+  HTTP_STATUS
 };
