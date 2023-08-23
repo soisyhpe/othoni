@@ -3,6 +3,7 @@ const logger = require('../middleware/logger');
 
 class Database {
   constructor() {
+    const mongoUri = `mongodb://${process.env.DB_USER}:${process.env.DB_PASSWORD}@${process.env.MONGO_URI}`
     this.client = new MongoClient(process.env.MONGO_URI, { useUnifiedTopology: true });
   }
 
