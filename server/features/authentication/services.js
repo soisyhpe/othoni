@@ -1,4 +1,5 @@
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcrypt');
 const { usersCollection } = require('../../config/config');
 const logger = require('../../middleware/logger');
 const { withDatabase } = require('../../utils/database');
@@ -10,7 +11,8 @@ const AuthenticationServices = {
       const token = jwt.sign({ userId }, process.env.SECRET_KEY, { expiresIn: '1h' });
       return token;
     } catch (error) {
-      logger.error('Error generating JWT token:', error);
+      logger.error('Error generating JWT token.');
+      logger.debug(`Error details:`, error);
       throw error;
     }
   },
@@ -27,14 +29,16 @@ const AuthenticationServices = {
 
   async createUser(username, password) {
     try {
+      const hashedPassword = await bcrypt.hash(password, 10);
       return await withDatabase(async (database) => {
         const collection = database.db.collection(usersCollection);
-        const user = { username, password };
+        const user = { username, hashedPassword };
         await collection.insertOne(user);
         logger.info('User created:', username);
       });
     } catch (error) {
-      logger.error('Error creating user:', error);
+      logger.error(`Error creating user with username ${username}`);
+      logger.debug(`Error details:`, error);
       throw error;
     }
   },
@@ -54,7 +58,8 @@ const AuthenticationServices = {
         return result.deletedCount;
       });
     } catch (error) {
-      logger.error(`Failed to delete user ${username} from the database:`, error);
+      logger.error(`Failed to delete user ${username} from the database.`);
+      logger.debug(`Error details:`, error);
       throw error;
     }
   },
@@ -67,7 +72,8 @@ const AuthenticationServices = {
         return user;
       });
     } catch (error) {
-      logger.error('Error finding user:', error);
+      logger.error(`Error finding user with username ${username}`);
+      logger.debug(`Error details:`, error);
       throw error;
     }
   },
@@ -82,7 +88,8 @@ const AuthenticationServices = {
         return result;
       });
     } catch (error) {
-      logger.error('Failed to get user list:', error);
+      logger.error('Failed to get user list.');
+      logger.debug(`Error details:`, error);
       throw error;
     }
   },
