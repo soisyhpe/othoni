@@ -48,7 +48,6 @@ const ServerController = {
       logger.info("Received request for server list.");
       const offset = req.params.offset || 0;
       const limit = req.params.limit || 10;
-
       const result = await ServerServices.getServers(offset, limit);
       res.status(HTTP_STATUS.OK).json(result);
       logger.info("Server list sent.");
@@ -56,7 +55,6 @@ const ServerController = {
       logger.error('Failed to get server list:', error);
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Failed to get servers' });
     }
-    res.json(servers);
   },
 
   async getServer(req, res) {
