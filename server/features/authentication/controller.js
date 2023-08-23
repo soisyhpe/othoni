@@ -9,6 +9,11 @@ const AuthenticationController = {
 
   async registerUser(req, res) {
     const { username, password } = req.body;
+
+    if (!username || !password) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Username and password are required' });
+    }
+    
     try {
       await AuthenticationService.createUser(username, password);
       logger.info(`User created successfully: ${username}`);
