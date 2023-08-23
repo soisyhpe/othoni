@@ -41,7 +41,8 @@ const ServerController = {
       res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', server });
     } catch (error) {
       if (error.code === 11000) {
-        logger.error('Duplicate key error:', error);
+        logger.error('Duplicate key error.');
+        logger.debug(`Error details:`, error);
         res.status(HTTP_STATUS.CONFLICT).json({ error: 'Server already exists' });
       } else {
         logger.error(`Unable to add server: ${server.host}:${server.port}`);
