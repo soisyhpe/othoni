@@ -1,7 +1,6 @@
 const jwt = require('jsonwebtoken');
 
-const { 
-  SECRET_KEY,
+const {
   HTTP_STATUS
 } = require('../utils/constantsAndFunctions');
 
@@ -13,7 +12,7 @@ function verifyToken(req, res, next) {
     return res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'No token provided' });
   }
 
-  jwt.verify(token, SECRET_KEY, (err, decoded) => {
+  jwt.verify(token, process.env.SECRET_KEY, (err, decoded) => {
     if (err) {
       return res.status(HTTP_STATUS.FORBIDDEN).json({ message: 'Invalid token' });
     }
