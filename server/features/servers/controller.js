@@ -11,10 +11,15 @@ const ServerServices = require('./services');
 const ServerController = {
 
   async addServer(req, res) {
+    const { host, port } = req.body;
+
+    if (!host || !port) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Host and port are required' });
+    }
+
     try {
-      const { host, port } = req.body;
-      const result = await ServerServices.addServer(host, port);
-      res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', id: result });
+      const result = await ServerServices.addServer({ host: host, port: port });
+      res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', host: host });
     } catch (error) {
       logger.error('Unable to add server:', error);
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ error: 'Server addition failed' });
