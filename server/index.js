@@ -1,5 +1,6 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const winston = require('winston');
 const logger = require('./middleware/logger');
 
 const app = express();
@@ -7,9 +8,13 @@ const API_PATH = "/api/v1";
 
 logger.info("Starting application...");
 
-// Initialize .env
+// Initialize environment
 function initEnvironment() {
   require('dotenv').config();
+  
+  if (process.env.NODE_ENV === 'develop') {
+    logger.add(new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }));
+  }
 }
 
 // Initialize configuration
