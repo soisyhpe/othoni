@@ -1,5 +1,6 @@
 module.exports = {
   fetchInterval: 10, // every 10 minutes
   defaultOffset: 0,
-  defaultLimit: 10
+  defaultLimit: 10,
+  cacheExpirationInMilliseconds: 60000, // 1000 (1 second) * 60 (seconds in 1 minute) = 1 minute
 }
