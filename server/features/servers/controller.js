@@ -84,9 +84,8 @@ const ServerController = {
   },
 
   async getServer(req, res) {
-    const serverAddressWithPort = req.params.server_address_with_port;
-
     logger.info(`Received request for server data: ${serverAddressWithPort}`);
+    const serverAddressWithPort = req.params.server_address_with_port;
 
     if (!serverAddressWithPort.match(SERVER_WITH_PORT_REGEX)) {
       logger.warn(`Invalid server address: ${serverAddressWithPort}`);
