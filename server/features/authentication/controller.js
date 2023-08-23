@@ -13,7 +13,7 @@ const AuthenticationController = {
     if (!username || !password) {
       return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Username and password are required' });
     }
-    
+
     try {
       await AuthenticationService.createUser(username, password);
       logger.info(`User created successfully: ${username}`);
@@ -25,8 +25,13 @@ const AuthenticationController = {
   },
 
   async deleteUser(req, res) {
+    const username = req.params.username;
+
+    if (!username) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ message: 'Username is required' });
+    }
+
     try {
-      const username = req.params.username;
       const result = await AuthenticationService.deleteUser(username);
 
       if (result > 0) {
