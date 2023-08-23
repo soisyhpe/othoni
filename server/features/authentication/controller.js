@@ -1,8 +1,9 @@
-const { check, param, validationResult } = require('express-validator');
+const { check, param } = require('express-validator');
 const bcrypt = require('bcrypt');
 const logger = require('../../middleware/logger');
 const { validationCheck } = require('../../middleware/validation');
 const AuthenticationService = require('./services');
+const { USER_PASSWORD_REGEX } = require('../../utils/constantsAndFunctions');
 
 const {
   HTTP_STATUS
@@ -17,7 +18,7 @@ const AuthenticationController = {
       .isLength({ min: 3, max: 16 }).withMessage('Username must be between 3 and 16 characters'),
     check('password')
       .notEmpty().withMessage('Password is required')
-      .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/).withMessage('Password must be at least 8 characters long and contain at least one digit, one lowercase letter, and one uppercase letter')
+      .matches(USER_PASSWORD_REGEX).withMessage('Password must be at least 8 characters long and contain at least one digit, one lowercase letter, and one uppercase letter')
   ],
 
   async registerUser(req, res) {
@@ -30,9 +31,15 @@ const AuthenticationController = {
       logger.info(`User created successfully: ${username}`);
       res.status(HTTP_STATUS.CREATED).json({ message: 'User created successfully' });
     } catch (error) {
-      logger.warn(`Failed to create user: ${username}`);
-      logger.debug(`Error details:`, error);
-      res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create user' });
+      if (error.code === 11000) {
+        logger.error('Duplicate key error.');
+        logger.debug(`Error details:`, error);
+        res.status(HTTP_STATUS.CONFLICT).json({ error: 'User with the same username already exists' });
+      } else {
+        logger.warn(`Failed to create user: ${username}`);
+        logger.debug(`Error details:`, error);
+        res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Failed to create user' });
+      }
     }
   },
 
@@ -86,7 +93,7 @@ const AuthenticationController = {
       .isLength({ min: 3, max: 16 }).withMessage('Username must be between 3 and 16 characters'),
     check('password')
       .notEmpty().withMessage('Password is required')
-      .matches(/^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])[0-9a-zA-Z]{8,}$/).withMessage('Password must be at least 8 characters long and contain at least one digit, one lowercase letter, and one uppercase letter')
+      .matches(USER_PASSWORD_REGEX).withMessage('Password must be at least 8 characters long and contain at least one digit, one lowercase letter, and one uppercase letter')
   ],
 
   async loginUser(req, res) {
