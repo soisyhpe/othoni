@@ -1,12 +1,6 @@
-const logger = require('../../middleware/logger');
 const mc = require('minecraft-protocol');
-
-const { 
-  HTTP_STATUS, 
-  servers
-} = require('../../utils/constantsAndFunctions');
-
-const serversData = new Map();
+const logger = require('../../middleware/logger');
+const ServerServices = require('./services');
 
 async function fetchServerData(server) {
   try {
@@ -20,37 +14,30 @@ async function fetchServerData(server) {
   }
 }
 
-function getServerData(requestedServer) {
-  var serverData;
-  for (const server of serversData) {
-    if (server[0].host === requestedServer.host && server[0].port === requestedServer.port) serverData = server[1];
+async function fetchServersData() {
+  try {
+    const servers = await ServerServices.getServers();
+    const currentDate = new Date();
+    currentDate.setSeconds(0, 0); // Reset seconds and milliseconds to 0
+
+    for (const server of servers) {
+      try {
+        const serverData = await fetchServerData(server);
+        const playerCount = serverData.players.online;
+        
+        await ServerServices.recordServerActivity(server, playerCount, currentDate);
+        logger.info(`Recorded activity for server: ${server.host}:${server.port}`);
+      } catch (error) {
+        logger.error(`Failed to fetch data for server: ${server.host}:${server.port}`, error);
+      }
+    }
+
+    logger.info('Data fetching and recording completed.');
+  } catch (error) {
+    logger.error('Failed to fetch and record data for servers:', error);
   }
-
-  if (serverData) {
-    logger.info(`Retrieved data for ${requestedServer.host}:${requestedServer.port}`);
-    return [HTTP_STATUS.OK, serverData]
-  } else {
-    logger.warn(`No data found for ${requestedServer.host}:${requestedServer.port}`);
-    return [HTTP_STATUS.BAD_REQUEST, { "Error": `'${requestedServer.host}:${requestedServer.port}' is registered but has no data in our database!` }];
-  }
-}
-
-function fetchServersData() {
-  logger.info("Fetching data from all servers...");
-  
-  const requests = servers.map(fetchServerData);
-  const result = Promise.all(requests);
-
-  result.then((data) => {
-    servers.forEach((server, index) => {
-      serversData.set( { 'host': server.host, 'port': server.port } , data[index]);
-    })
-
-    logger.info("Data fetched and updated for all servers.");
-  });
 }
 
 module.exports = {
   fetchServersData,
-  getServerData,
 };
