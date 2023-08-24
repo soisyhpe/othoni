@@ -57,7 +57,7 @@ const ServerServices = {
     try {
       return await withDatabase(async (database) => {
         const collection = database.db.collection(monitoringCollection);
-        const document = { host: server.host, player_amount: player_count, date: date };
+        const document = { host: server.host, port: server.port, player_count: player_count, date: date };
         const result = await collection.insertOne(document);
         logger.info(`Data inserted for server ${server.host}:${server.port}, ID: ${result.insertedId}`);
         return result.insertedId;
@@ -90,19 +90,65 @@ const ServerServices = {
   async getServer(server) {
     try {
       return await withDatabase(async (database) => {
-        const collection = database.db.collection(monitoringCollection);
-        const result = await collection.find(server).toArray();
-        
+        const servers = database.db.collection(serversCollection);
+        const monitoring = database.db.collection(monitoringCollection);
+
+        const aggregationPipeline = [
+          {
+            $match: {
+              host: server.host,
+              port: server.port
+            }
+          },
+          {
+            $lookup: {
+              from: monitoring.collectionName,
+              localField: 'host',
+              foreignField: 'host',
+              as: 'monitoringData'
+            }
+          },
+          {
+            $unwind: '$monitoringData'
+          },
+          {
+            $group: {
+              _id: {
+                _id: '$_id',
+                host: '$host',
+                port: '$port',
+                favicon: '$favicon'
+              },
+              maxPlayerCount: { $max: '$monitoringData.player_count' },
+              maxPlayerCountDate: { $max: '$monitoringData.date' }
+            }
+          },
+          {
+            $project: {
+              _id: '$_id._id',
+              host: '$_id.host',
+              port: '$_id.port',
+              favicon: '$_id.favicon',
+              player_count_record: '$maxPlayerCount',
+              player_count_record_date: '$maxPlayerCountDate'
+            }
+          }
+        ];
+
+        const result = await servers.aggregate(aggregationPipeline).toArray();
+
         if (result.length === 0) {
           logger.warn(`No data found for server ${server.host}:${server.port}`);
           return null;
         }
 
-        logger.info(`Retrieved ${result.length} data entries for server ${server.host}:${server.port}`);
-        return result;
+        logger.info(`Retrieved data for server ${server.host}:${server.port}`);
+        return result[0]; // Assuming there will be only one result
+        
       });
     } catch (error) {
-      logger.error(`Failed to get data for server ${server.host}:${server.port}:`, error);
+      logger.error(`Failed to get data for server ${server.host}:${server.port}.`);
+      logger.debug(`Error details:`, error);
       throw error;
     }
   }
