@@ -100,6 +100,7 @@ const AuthenticationController = {
     validationCheck(req, res);
 
     const { username, password } = req.body;
+    logger.info(`User '${username}' is logging in...`);
 
     try {
       const user = await AuthenticationService.findUserByUsername(username);

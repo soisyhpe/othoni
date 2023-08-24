@@ -1,5 +1,5 @@
 const mc = require('minecraft-protocol');
-const { monitoringCollection } = require('../../config/config');
+const { serversCollection, monitoringCollection } = require('../../config/config');
 const logger = require('../../middleware/logger');
 const { withDatabase } = require('../../utils/database');
 const ServerServices = require('./services');
@@ -20,7 +20,8 @@ async function fetchServersData() {
   try {
     const servers = await ServerServices.getServers();
 
-    const batchOperations = [];
+    const batchOperationsServers = [];
+    const batchOperationsMonitoring = [];
     for (const server of servers) {
       const serverData = await fetchServerData(server);
       
@@ -28,7 +29,20 @@ async function fetchServersData() {
         const playerCount = serverData.players.online;
         const currentDate = new Date();
         currentDate.setSeconds(0, 0);
-        batchOperations.push({
+
+        // TODO : console.debug(serverData.description);
+        // TODO : console.debug(serverData.version);
+        
+        batchOperationsServers.push({
+          updateOne: {
+            filter: { 
+              host: server.host, 
+              port: server.port
+            },
+            update: { $set: { favicon: serverData.favicon } }
+          }
+        })
+        batchOperationsMonitoring.push({
           insertOne: {
             document : {
               host: server.host, 
@@ -41,11 +55,15 @@ async function fetchServersData() {
     }
 
     await withDatabase(async (database) => {
-      const collection = database.db.collection(monitoringCollection);
+      const servers = database.db.collection(serversCollection);
+      const monitoring = database.db.collection(monitoringCollection);
       const session = database.client.startSession();
+
       session.startTransaction();
+
       try {
-        await collection.bulkWrite(batchOperations, { session });
+        await servers.bulkWrite(batchOperationsServers, { session });
+        await monitoring.bulkWrite(batchOperationsMonitoring, { session });
         await session.commitTransaction();
         logger.info('Data fetching and recording completed.');
       } catch (error) {

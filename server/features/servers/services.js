@@ -68,6 +68,25 @@ const ServerServices = {
     }
   },
 
+  async updateFavicon(server, favicon) {
+    try {
+      return await withDatabase(async (database) => {
+        const collection = database.db.collection(serversCollection);
+  
+        const filter = { host: server.host, port: server.port };
+        const update = { $set: { favicon: favicon } };
+  
+        await collection.updateOne(filter, update);
+  
+        logger.debug(`Favicon updated for server: ${server.host}:${server.port}`);
+      });
+    } catch (error) {
+      logger.error(`Failed to update favicon for server: ${server.host}:${server.port}`);
+      logger.debug(`Error details:`, error);
+      throw error;
+    }
+  },
+
   async getServer(server) {
     try {
       return await withDatabase(async (database) => {
