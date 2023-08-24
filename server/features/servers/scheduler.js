@@ -1,5 +1,5 @@
-const logger = require('../../middleware/logger');
 const { fetchInterval } = require('../../config/config');
+const logger = require('../../middleware/logger');
 const { fetchServersData } = require('./fetcher');
 
 function scheduleTask() {

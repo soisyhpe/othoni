@@ -1,17 +1,27 @@
 const express = require('express');
 const bodyParser = require('body-parser');
+const winston = require('winston');
 const logger = require('./middleware/logger');
 
 const app = express();
-const { port } = require('./config/config');
 const API_PATH = "/api/v1";
 
 logger.info("Starting application...");
 
+// Initialize environment
+function initEnvironment() {
+  require('dotenv').config();
+  
+  if (process.env.NODE_ENV === 'develop') {
+    //logger.add(new winston.transports.Console({ level: 'debug' }));
+    logger.add(new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }));
+  }
+}
+
 // Initialize configuration
 function initConfig() {
   const config = require('./config/config');
-  if (!config.port || !config.fetchInterval) {
+  if (!config.fetchInterval) {
     logger.error('Configuration values are missing.');
     process.exit(1);
   } else {
@@ -34,10 +44,10 @@ function initScheduledTask() {
 
 // Initialize routes
 function initRoutes() {
-  // authorizations routes
-  const authorizationsRoutes = require('./features/authorizations/routes');
-  app.use(API_PATH + "/authorizations", authorizationsRoutes);
-  logger.info(`Routes set up for ${API_PATH}/authorizations`);
+  // authentication routes
+  const authenticationRoutes = require('./features/authentication/routes');
+  app.use(API_PATH + "/authentication", authenticationRoutes);
+  logger.info(`Routes set up for ${API_PATH}/authentication`);
 
   // servers routes
   const serversRoutes = require('./features/servers/routes');
@@ -54,6 +64,7 @@ function initErrorHandler() {
 
 // Start the server
 function startServer() {
+  const port = process.env.PORT;
   app.listen(port, () => {
     logger.info(`Server is running on port ${port}`);
   });
@@ -61,7 +72,8 @@ function startServer() {
 
 // Initialize the application
 function initializeApp() {
-  const config = initConfig();
+  initEnvironment();
+  initConfig();
   initAuthorization();
   initScheduledTask();
   initRoutes();
