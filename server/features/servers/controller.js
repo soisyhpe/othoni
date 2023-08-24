@@ -1,5 +1,5 @@
 const cache = require('memory-cache');
-const { check, param, validationResult } = require('express-validator');
+const { body, param, validationResult } = require('express-validator');
 const { defaultOffset, defaultLimit, cacheExpirationInMilliseconds } = require('../../config/config');
 const logger = require('../../middleware/logger');
 const { validationCheck } = require('../../middleware/validation');
@@ -10,10 +10,10 @@ const ServerController = {
 
   // Validation des données pour l'ajout d'un serveur
   addServerValidations: [
-    check('host')
+    body('host')
       .notEmpty().withMessage('Host is required')
       .matches(SERVER_ADDRESS_REGEX).withMessage('Invalid server host'),
-    check('port')
+    body('port')
       .notEmpty().withMessage('Port is required')
       .isInt({ min: 0, max: 65535 }).withMessage('Port must be a valid number between 0 and 65535')
   ],
@@ -27,8 +27,6 @@ const ServerController = {
     const server = req.body;
 
     try {
-      await ServerServices.addServer(server);
-
       const cachedKey = `servers_${defaultOffset}_${defaultLimit}`;
       const cachedServers = cache.get(cachedKey);
 
@@ -38,6 +36,7 @@ const ServerController = {
         logger.debug(`Added server to cache: ${server.host}:${server.port}`);
       }
 
+      await ServerServices.addServer(server);
       res.status(HTTP_STATUS.CREATED).json({ message: 'Server added', server });
     } catch (error) {
       if (error.code === 11000) {
@@ -54,7 +53,8 @@ const ServerController = {
 
   // Suppression d'un serveur
   deleteServerValidations: [
-    param('server_address_with_port').matches(SERVER_WITH_PORT_REGEX).withMessage((value, { req }) => `'${value}' is not a valid minecraft server address!`)
+    param('server_address_with_port')
+      .matches(SERVER_WITH_PORT_REGEX).withMessage((value, { req }) => `'${value}' is not a valid minecraft server address!`)
   ],
 
   async deleteServer(req, res) {
@@ -120,7 +120,8 @@ const ServerController = {
 
   // Récupération d'un serveur
   getServerValidations: [
-    param('server_address_with_port').matches(SERVER_WITH_PORT_REGEX).withMessage((value, { req }) => `'${value}' is not a valid minecraft server address!`)
+    param('server_address_with_port')
+      .matches(SERVER_WITH_PORT_REGEX).withMessage((value, { req }) => `'${value}' is not a valid minecraft server address!`)
   ],
 
   async getServer(req, res) {

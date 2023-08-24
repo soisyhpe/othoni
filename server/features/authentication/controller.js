@@ -1,4 +1,4 @@
-const { check, param } = require('express-validator');
+const { body, param } = require('express-validator');
 const bcrypt = require('bcrypt');
 const logger = require('../../middleware/logger');
 const { validationCheck } = require('../../middleware/validation');
@@ -13,10 +13,10 @@ const AuthenticationController = {
 
   // Validation des données pour l'inscription d'un utilisateur
   registerUserValidations: [
-    check('username')
+    body('username')
       .notEmpty().withMessage('Username is required')
       .isLength({ min: 3, max: 16 }).withMessage('Username must be between 3 and 16 characters'),
-    check('password')
+    body('password')
       .notEmpty().withMessage('Password is required')
       .matches(USER_PASSWORD_REGEX).withMessage('Password must be at least 8 characters long and contain at least one digit, one lowercase letter, and one uppercase letter')
   ],
@@ -88,10 +88,10 @@ const AuthenticationController = {
 
   // Validation des données pour la connexion d'un utilisateur
   loginUserValidations: [
-    check('username')
+    body('username')
       .notEmpty().withMessage('Username is required')
       .isLength({ min: 3, max: 16 }).withMessage('Username must be between 3 and 16 characters'),
-    check('password')
+    body('password')
       .notEmpty().withMessage('Password is required')
       .matches(USER_PASSWORD_REGEX).withMessage('Password must be at least 8 characters long and contain at least one digit, one lowercase letter, and one uppercase letter')
   ],
