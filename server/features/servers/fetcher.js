@@ -1,12 +1,8 @@
-const logger = require('../../middleware/logger');
 const mc = require('minecraft-protocol');
-
-const { 
-  HTTP_STATUS, 
-  servers
-} = require('../../utils/constantsAndFunctions');
-
-const serversData = new Map();
+const { serversCollection, monitoringCollection } = require('../../config/config');
+const logger = require('../../middleware/logger');
+const { withDatabase } = require('../../utils/database');
+const ServerServices = require('./services');
 
 async function fetchServerData(server) {
   try {
@@ -20,37 +16,69 @@ async function fetchServerData(server) {
   }
 }
 
-function getServerData(requestedServer) {
-  var serverData;
-  for (const server of serversData) {
-    if (server[0].host === requestedServer.host && server[0].port === requestedServer.port) serverData = server[1];
+async function fetchServersData() {
+  try {
+    const servers = await ServerServices.getServers();
+
+    const batchOperationsServers = [];
+    const batchOperationsMonitoring = [];
+    for (const server of servers) {
+      const serverData = await fetchServerData(server);
+      
+      if (serverData) {
+        const playerCount = serverData.players.online;
+        const currentDate = new Date();
+        currentDate.setSeconds(0, 0);
+
+        // TODO : console.debug(serverData.description);
+        // TODO : console.debug(serverData.version);
+        
+        batchOperationsServers.push({
+          updateOne: {
+            filter: { 
+              host: server.host, 
+              port: server.port
+            },
+            update: { $set: { favicon: serverData.favicon } }
+          }
+        })
+        batchOperationsMonitoring.push({
+          insertOne: {
+            document : {
+              host: server.host, 
+              player_amount: playerCount, 
+              date: currentDate
+            }
+          }
+        });
+      }
+    }
+
+    await withDatabase(async (database) => {
+      const servers = database.db.collection(serversCollection);
+      const monitoring = database.db.collection(monitoringCollection);
+      const session = database.client.startSession();
+
+      session.startTransaction();
+
+      try {
+        await servers.bulkWrite(batchOperationsServers, { session });
+        await monitoring.bulkWrite(batchOperationsMonitoring, { session });
+        await session.commitTransaction();
+        logger.info('Data fetching and recording completed.');
+      } catch (error) {
+        await session.abortTransaction();
+        logger.error('Failed to fetch and record data for servers:', error);
+        throw error;
+      } finally {
+        session.endSession();
+      }
+    });
+  } catch (error) {
+    logger.error('An error occurred during server data fetching:', error);
   }
-
-  if (serverData) {
-    logger.info(`Retrieved data for ${requestedServer.host}:${requestedServer.port}`);
-    return [HTTP_STATUS.OK, serverData]
-  } else {
-    logger.warn(`No data found for ${requestedServer.host}:${requestedServer.port}`);
-    return [HTTP_STATUS.BAD_REQUEST, { "Error": `'${requestedServer.host}:${requestedServer.port}' is registered but has no data in our database!` }];
-  }
-}
-
-function fetchServersData() {
-  logger.info("Fetching data from all servers...");
-  
-  const requests = servers.map(fetchServerData);
-  const result = Promise.all(requests);
-
-  result.then((data) => {
-    servers.forEach((server, index) => {
-      serversData.set( { 'host': server.host, 'port': server.port } , data[index]);
-    })
-
-    logger.info("Data fetched and updated for all servers.");
-  });
 }
 
 module.exports = {
   fetchServersData,
-  getServerData,
 };
