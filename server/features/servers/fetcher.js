@@ -39,9 +39,12 @@ async function fetchServersData() {
               host: server.host, 
               port: server.port
             },
-            update: { $set: { favicon: serverData.favicon } }
+            update: { 
+              $set: { favicon: serverData.favicon }//,
+              //$max: { player_count_record: playerCount } // replace this
+            }
           }
-        })
+        });
         batchOperationsMonitoring.push({
           insertOne: {
             document : {

@@ -124,9 +124,10 @@ const ServerController = {
       .matches(SERVER_WITH_PORT_REGEX).withMessage((value, { req }) => `'${value}' is not a valid minecraft server address!`)
   ],
 
+  // Récupération des données d'un serveur
   async getServer(req, res) {
     logger.info(`Received request for server data`);
-
+    
     validationCheck(req, res);
 
     const serverAddressWithPort = req.params.server_address_with_port;
