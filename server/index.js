@@ -13,6 +13,7 @@ function initEnvironment() {
   require('dotenv').config();
   
   if (process.env.NODE_ENV === 'develop') {
+    logger.add(new winston.transports.Console({ level: 'debug' }),)
     logger.add(new winston.transports.File({ filename: 'logs/debug.log', level: 'debug' }));
   }
 }
