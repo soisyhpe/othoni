@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const winston = require('winston');
+const cors = require('cors');
 const logger = require('./middleware/logger');
 
 const app = express();
@@ -33,6 +34,10 @@ function initConfig() {
 
 // Initialize authorization
 function initAuthorization() {
+  app.use(express.json());
+  app.use(cors({
+    origin: 'http://localhost:3001' // allow request from http://localhost:3001
+  }))
   app.use(bodyParser.json());
 }
 
