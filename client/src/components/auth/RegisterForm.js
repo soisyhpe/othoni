@@ -4,8 +4,10 @@ import * as Yup from 'yup';
 import AuthServices from '../../services/AuthServices';
 
 import { useNotification } from '../context/NotificationContext';
-import Button from '../buttons/Button';
 import LoginForm from '../auth/LoginForm';
+import Button from '../buttons/Button';
+import InputField from '../form/InputField';
+import PasswordField from '../form/PasswordField';
 
 const RegisterForm = () => {
   const [redirectToLogin, setRedirectToLogin] = useState(false);
@@ -72,68 +74,36 @@ const RegisterForm = () => {
             <p className="text-base font-regular">An account to manage your servers.</p>
           </div>
           
-          <div className="flex flex-col">
-            <label className="mb-2 text-base font-bold" htmlFor="username">Email or username</label>
-            <input
-              className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
-                formik.touched.username && formik.errors.username ? 'border-red-500' : ''
-              }`}
-              type="text"
-              id="username"
-              name="username"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.username}
-            />
-            {formik.touched.username && formik.errors.username && (
-              <div className="text-base text-custom-red">{formik.errors.username}</div>
-            )}
-          </div>
+          <InputField
+            label="Email or username"
+            name="username"
+            type="text"
+            value={formik.values.username}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.username && formik.errors.username}
+          />
 
-          <div className="flex flex-col">
-            <label className="mt-4 mb-2 text-base font-bold" htmlFor="password">Password</label>
-            <div className="relative w-full">
-              <input
-                className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
-                  formik.touched.password && formik.errors.password ? 'border-red-500' : ''
-                }`}
-                type={showPassword ? 'text' : 'password'}
-                id="password"
-                name="password"
-                onChange={formik.handleChange}
-                onBlur={formik.handleBlur}
-                value={formik.values.password}
-              />
-              <button
-                className="font-semibold absolute top-1/2 right-4 transform -translate-y-1/2"
-                type="button"
-                onClick={() => setShowPassword(!showPassword)}
-              >
-                {showPassword ? 'Hide' : 'Show'}
-              </button>
-            </div>
-            {formik.touched.password && formik.errors.password && (
-              <div className="text-base text-custom-red">{formik.errors.password}</div>
-            )}
-          </div>
+          <PasswordField
+            label="Password"
+            name="password"
+            value={formik.values.password}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            showPassword={showPassword}
+            togglePassword={() => setShowPassword(!showPassword)}
+            error={formik.touched.password && formik.errors.password}
+          />
 
-          <div className="flex flex-col mb-2">
-            <label className="mt-4 mb-2 text-base font-bold" htmlFor="confirmPassword">Confirm Password</label>
-            <input
-              className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
-                formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : ''
-              }`}
-              type='password'
-              id="confirmPassword"
-              name="confirmPassword"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.confirmPassword}
-            />
-            {formik.touched.confirmPassword && formik.errors.confirmPassword && (
-              <div className="text-base text-custom-red">{formik.errors.confirmPassword}</div>
-            )}
-          </div>
+          <InputField
+            label="Confirm Password"
+            name="confirmPassword"
+            type="password"
+            value={formik.values.confirmPassword}
+            onChange={formik.handleChange}
+            onBlur={formik.handleBlur}
+            error={formik.touched.confirmPassword && formik.errors.confirmPassword}
+          />
           
           <Button type="submit" disabled={formik.isSubmitting}>Register</Button>
         </form>

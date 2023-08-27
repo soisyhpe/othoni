@@ -6,6 +6,9 @@ import { useNavigate } from 'react-router-dom';
 
 import { useNotification } from '../context/NotificationContext';
 import Button from '../buttons/Button';
+import InputField from '../form/InputField';
+import PasswordField from '../form/PasswordField';
+
 import AuthServices from '../../services/AuthServices';
 
 import '../../styles/custom.css';
@@ -97,50 +100,26 @@ const LoginForm = () => {
           <p className="text-base font-regular">Enter your account details.</p>
         </div>
 
-        <div className="flex flex-col">
-          <label className="mb-2 text-base font-bold" htmlFor="username">Email or username</label>
-          <input
-            className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
-              formik.touched.username && formik.errors.username ? 'border-red-500' : ''
-            }`}
-            type="text"
-            id="username"
-            name="username"
-            onChange={formik.handleChange}
-            onBlur={formik.handleBlur}
-            value={formik.values.username}
-          />
-          {formik.touched.username && formik.errors.username ? (
-            <div className="text-base text-custom-red">{formik.errors.username}</div>
-          ) : null}
-        </div>
+        <InputField
+          label="Email or username"
+          name="username"
+          type="text"
+          value={formik.values.username}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          error={formik.touched.username && formik.errors.username}
+        />
 
-        <div className="flex flex-col mb-4">
-          <label className="mt-4 mb-2 text-base font-bold" htmlFor="password">Password</label>
-          <div className="relative w-full">
-            <input
-              className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
-                formik.touched.password && formik.errors.password ? 'border-red-500' : ''
-              }`}
-              type={showPassword ? 'text' : 'password'}
-              id="password"
-              name="password"
-              onChange={formik.handleChange}
-              onBlur={formik.handleBlur}
-              value={formik.values.password}
-            />
-            <button
-              className="font-semibold absolute top-1/2 right-4 transform -translate-y-1/2"
-              type="button"
-              onClick={() => setShowPassword(!showPassword)}
-            >
-              {showPassword ? 'Hide' : 'Show'}
-            </button>
-          </div>
-          {formik.touched.password && formik.errors.password ? (
-            <div className="text-base text-custom-red">{formik.errors.password}</div>
-          ) : null}
-        </div>
+        <PasswordField
+          label="Password"
+          name="password"
+          value={formik.values.password}
+          onChange={formik.handleChange}
+          onBlur={formik.handleBlur}
+          showPassword={showPassword}
+          togglePassword={() => setShowPassword(!showPassword)}
+          error={formik.touched.password && formik.errors.password}
+        />
 
         <div className="flex items-center">
           <input 
