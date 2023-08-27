@@ -3,6 +3,7 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 
 import ErrorNotification from './components/notifications/ErrorNotification';
 import SuccessNotification from './components/notifications/SuccessNotification';
+import WarningNotification from './components/notifications/WarningNotification';
 
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
@@ -14,6 +15,7 @@ function App() {
     <div className="App">
       <ErrorNotification/>
       <SuccessNotification/>
+      <WarningNotification/>
       <Routes>
         {/* Default route */}
         <Route path="/" element={<Navigate to="/home" />} />
