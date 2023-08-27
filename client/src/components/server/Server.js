@@ -1,5 +1,5 @@
 import React from 'react';
-import CopyToClipboardButton from '../common/CopyToClipboardButton';
+import CopyToClipboardButton from '../buttons/CopyToClipboardButton';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { icon } from '@fortawesome/fontawesome-svg-core/import.macro';
