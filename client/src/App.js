@@ -8,6 +8,7 @@ import WarningNotification from './components/notifications/WarningNotification'
 
 import AuthPage from './pages/AuthPage';
 import HomePage from './pages/HomePage';
+import ServerPage from './pages/ServerPage';
 import ManagerPage from './pages/ManagerPage';
 import ErrorPage from './pages/ErrorPage';
 
@@ -24,6 +25,7 @@ function App() {
 
         <Route path="/auth" element={<AuthPage/>} />
         <Route path="/home" element={<HomePage/>} />
+        <Route path="/server/:serverAddress" element={<ServerPage />} />
         <Route path="/manager" element={<ManagerPage/>} />
 
         <Route path="*" element={<ErrorPage/>} />
