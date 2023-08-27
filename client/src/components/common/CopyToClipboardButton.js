@@ -30,7 +30,7 @@ const CopyToClipboardButton = ({ text }) => {
         >
           {text}
           {showTooltip && (
-            <div className='absolute top-0 left-full border border-custom-border bg-white ml-2 px-2 w-max text-base text-black rounded-lg'>
+            <div className='absolute top-0.5 left-full border border-custom-border bg-white ml-2 px-2 w-max text-sm text-black rounded-lg'>
               {showCopiedMessage ? (
                 <span>Copied to clipboard!</span>
               ) : (
