@@ -18,9 +18,9 @@ const InfoNotification = () => {
         clearTimeout(timeout);
       };
     }
-  }, [warningMessage, hideNotification, isHovered]);
+  }, [infoMessage, hideNotification, isHovered]);
 
-  if (!warningMessage) {
+  if (!infoMessage) {
     return null;
   }
 
