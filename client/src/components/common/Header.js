@@ -1,29 +1,25 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
+import { useNotification } from '../context/NotificationContext';
+
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { icon } from '@fortawesome/fontawesome-svg-core/import.macro';
 
-import ErrorNotification from '../notifications/ErrorNotifications';
-
 const Header = () => {
+  const { showErrorMessage } = useNotification();
   const navigate = useNavigate();
-  const [showNotification, setShowNotification] = useState(false);
-
-  const handleNotificationClose = () => {
-    setShowNotification(false);
-  };
 
   const handleHomeClick = () => {
     navigate('/home');
   };
 
   const handleManagerClick = () => {
-    setShowNotification(true);
+    showErrorMessage('This feature will be available soon.');
   };
 
   const handleAddServerClick = () => {
-    setShowNotification(true);
+    showErrorMessage('This feature will be available soon.');
   };
 
   return (
@@ -54,12 +50,6 @@ const Header = () => {
             </Link>
           </div>
         </nav>
-      {showNotification && (
-        <ErrorNotification
-          message="This feature will be available soon."
-          onClose={handleNotificationClose}
-        />
-      )}
       </div>
     </header>
   );

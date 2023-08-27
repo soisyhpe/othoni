@@ -3,14 +3,22 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import AuthServices from '../../services/AuthServices';
 
-import LoginForm from '../auth/LoginForm';
+import { useNotification } from '../context/NotificationContext';
 import Button from '../common/Button';
-import ErrorNotification from '../notifications/ErrorNotifications';
+import LoginForm from '../auth/LoginForm';
 
 const RegisterForm = () => {
   const [redirectToLogin, setRedirectToLogin] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showErrorMessage, showSuccessMessage } = useNotification();
   const [showPassword, setShowPassword] = useState(false);
+
+  const showRegisterSuccessNotification = () => {
+    showSuccessMessage('You have successfully create your account!');
+  };
+
+  const showRegisterErrorNotification = (errorMessage) => {
+    showErrorMessage(errorMessage);
+  };
 
   const initialValues = {
     username: '',
@@ -37,17 +45,14 @@ const RegisterForm = () => {
     try {
       await AuthServices.register({ username: values.username, password: values.password });
       
-      setErrorMessage(null);
+      showRegisterSuccessNotification();
+
       setRedirectToLogin(true);
     } catch (error) {
-      setErrorMessage(error.message);
+      showRegisterErrorNotification(error.message);
     }
     setSubmitting(false);
   }
-
-  const handleNotificationClose = () => {
-    setErrorMessage('');
-  };
 
   const formik = useFormik({
     initialValues,
@@ -132,10 +137,6 @@ const RegisterForm = () => {
           
           <Button type="submit" disabled={formik.isSubmitting}>Register</Button>
         </form>
-        
-        {errorMessage && (
-          <ErrorNotification message={errorMessage} onClose={handleNotificationClose} />
-        )}
       </div>
     )
   );

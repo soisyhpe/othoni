@@ -3,18 +3,26 @@ import { useFormik } from 'formik';
 import * as Yup from 'yup';
 import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
-import AuthServices from '../../services/AuthServices';
 
+import { useNotification } from '../context/NotificationContext';
 import Button from '../common/Button';
-import ErrorNotification from '../notifications/ErrorNotifications';
+import AuthServices from '../../services/AuthServices';
 
 import '../../styles/custom.css';
 
 const LoginForm = () => {
   const [redirectToHome, setRedirectToHome] = useState(false);
-  const [errorMessage, setErrorMessage] = useState('');
+  const { showErrorMessage, showSuccessMessage } = useNotification();
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
+
+  const showLoginSuccessNotification = () => {
+    showSuccessMessage('You have successfully logged in!');
+  };
+
+  const showLoginErrorNotification = (errorMessage) => {
+    showErrorMessage(errorMessage);
+  };
 
   const initialValues = {
     username: '',
@@ -40,17 +48,16 @@ const LoginForm = () => {
       } else {
         Cookies.set('authToken', token);
       }
+      // Afficher la notification de succès
+      showLoginSuccessNotification();
 
-      // Redirect to Home
+      // Rediriger vers Home
       setRedirectToHome(true);
     } catch (error) {
-      setErrorMessage(error.message);
+      // Afficher la notification d'erreur
+      showLoginErrorNotification(error.message);
     }
   }
-
-  const handleNotificationClose = () => {
-    setErrorMessage('');
-  };
 
   useEffect(() => {
     const authToken = Cookies.get('authToken');
@@ -150,10 +157,6 @@ const LoginForm = () => {
 
         <Button onSubmit={formik.onSubmit} type='submit'>Sign in</Button>
       </form>
-      
-      {errorMessage && (
-        <ErrorNotification message={errorMessage} onClose={handleNotificationClose} />
-      )}
     </div>
   )
 };
