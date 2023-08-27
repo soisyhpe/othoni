@@ -5,7 +5,7 @@ import Header from '../components/common/Header';
 import Footer from '../components/common/Footer';
 import NotFound from '../components/errors/NotFound';
 
-import Button from '../components/common/Button';
+import Button from '../components/buttons/Button';
 
 const HomePage = () => {
   const location = useLocation();

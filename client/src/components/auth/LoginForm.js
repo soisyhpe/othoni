@@ -5,7 +5,7 @@ import Cookies from 'js-cookie';
 import { useNavigate } from 'react-router-dom';
 
 import { useNotification } from '../context/NotificationContext';
-import Button from '../common/Button';
+import Button from '../buttons/Button';
 import AuthServices from '../../services/AuthServices';
 
 import '../../styles/custom.css';

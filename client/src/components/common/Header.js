@@ -2,6 +2,8 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 import { useNotification } from '../context/NotificationContext';
+import ActionButton from '../buttons/ActionButton';
+import NavigationButton from '../buttons/NavigationButton';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { icon } from '@fortawesome/fontawesome-svg-core/import.macro';
@@ -9,6 +11,8 @@ import { icon } from '@fortawesome/fontawesome-svg-core/import.macro';
 const Header = () => {
   const { showErrorMessage } = useNotification();
   const navigate = useNavigate();
+
+  const [searchValue, setSearchValue] = useState('');
 
   const handleHomeClick = () => {
     navigate('/home');
@@ -32,20 +36,31 @@ const Header = () => {
               <img className="h-8 w-auto" src={require("../../othoni.svg").default} alt="" />
             </a>
 
-            <button className="text-sm font-semibold leading-6 text-white rounded-lg border border-custom-dark ml-4 p-2 hover:bg-custom-darker hover:border hover:border-custom-border" onClick={handleHomeClick}>
+            <NavigationButton onClick={handleHomeClick}>
               Home
-            </button>
-            <button className="text-sm font-semibold leading-6 text-white rounded-lg border border-custom-dark ml-4 p-2 hover:bg-custom-darker hover:border hover:border-custom-border" onClick={handleManagerClick}>
+            </NavigationButton>
+
+            <NavigationButton onClick={handleManagerClick}>
               Manager
-            </button>
-            <button className="text-sm font-semibold leading-6 text-white rounded-lg border border-custom-border p-2 ml-4 hover:bg-white hover:text-black" onClick={handleAddServerClick}>
-              <FontAwesomeIcon className='pr-1' icon={icon({name: 'plus'})} />
-              Add my server
-            </button>
+            </NavigationButton>
+
+            <input
+              className="bg-custom-dark border border-custom-border rounded-lg border border-custom-border p-2 ml-4 font-regular text-gray-400"
+              type="text"
+              placeholder="Search for a server"
+              value={searchValue}
+              onChange={(e) => setSearchValue(e.target.value)}
+            />
           </div>
 
           <div className="lg:flex lg:flex-1 lg:justify-end">
-            <Link to='/auth' className="text-sm font-semibold leading-6 text-white" onClick={() => {navigate('/auth')}}>
+
+            <ActionButton onClick={handleAddServerClick}>
+              <FontAwesomeIcon className='pr-1' icon={icon({name: 'plus'})} />
+              Add my server
+            </ActionButton>
+
+            <Link to='/auth' className="text-sm font-semibold leading-6 p-2 ml-4 text-slate-50" onClick={() => {navigate('/auth')}}>
               Log in / Sign up <span aria-hidden="true"><FontAwesomeIcon className='pr-1' icon={icon({name: 'arrow-right'})} /></span>
             </Link>
           </div>

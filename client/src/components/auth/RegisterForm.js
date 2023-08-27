@@ -4,7 +4,7 @@ import * as Yup from 'yup';
 import AuthServices from '../../services/AuthServices';
 
 import { useNotification } from '../context/NotificationContext';
-import Button from '../common/Button';
+import Button from '../buttons/Button';
 import LoginForm from '../auth/LoginForm';
 
 const RegisterForm = () => {
