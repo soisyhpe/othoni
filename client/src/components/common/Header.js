@@ -6,7 +6,7 @@ import ActionButton from '../buttons/ActionButton';
 import NavigationButton from '../buttons/NavigationButton';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { icon } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { faSearch, icon } from '@fortawesome/fontawesome-svg-core/import.macro';
 
 const Header = () => {
   const { showErrorMessage } = useNotification();
@@ -44,13 +44,16 @@ const Header = () => {
               Manager
             </NavigationButton>
 
-            <input
-              className="bg-custom-dark border border-custom-border rounded-lg border border-custom-border p-2 ml-4 font-regular text-gray-400"
-              type="text"
-              placeholder="Search for a server"
-              value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
-            />
+            <div className="ml-4 relative">
+              <FontAwesomeIcon className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400' icon={icon({name: 'search'})} />
+              <input
+                className="bg-custom-dark border border-custom-border rounded-lg border border-custom-border p-2 pl-10 font-regular text-gray-400"
+                type="text"
+                placeholder="Search for a server"
+                value={searchValue}
+                onChange={(e) => setSearchValue(e.target.value)}
+              />
+            </div>
           </div>
 
           <div className="lg:flex lg:flex-1 lg:justify-end">
