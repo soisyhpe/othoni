@@ -26,14 +26,16 @@ const InfoNotification = () => {
 
   return (
     <div
-    className="absolute top-8 right-8 py-3 px-4 bg-blue-800 rounded-xl"
+    className="absolute top-8 right-8 py-3 px-4 bg-gradient-to-r from-blue-700 to-blue-500  rounded-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex items-center justify-between">
+        <div className="mr-2 text-slate-50 flex items-center justify-center" onClick={hideNotification}>
+          <FontAwesomeIcon icon={icon({ name: 'circle-info' })} className="text-3xl" />
+        </div>
         <div className='text-slate-50'>
-          <h4 className="font-semibold">Info</h4>
-          <p className="-mt-1">{infoMessage}</p>
+          <p>{infoMessage}</p>
         </div>
         <button className="ml-2 pl-1.5 text-slate-50 flex items-center justify-center" onClick={hideNotification}>
           <FontAwesomeIcon icon={icon({ name: 'xmark' })} className="text-xl" />
