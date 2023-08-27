@@ -26,16 +26,16 @@ const ErrorNotification = () => {
 
   return (
     <div
-      className="bg-red-500 p-4 rounded-lg border border-red-800 shadow-md absolute backdrop-blur-sm top-8 right-8"
+      className="absolute top-8 right-8 py-3 px-4 bg-red-800 rounded-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex items-center justify-between">
-        <div className='text-red-800'>
+        <div className='text-slate-50'>
           <h4 className="font-semibold">Error</h4>
-          <p className="">{errorMessage}</p>
+          <p className="-mt-1">{errorMessage}</p>
         </div>
-        <button className="mt-0.5 ml-2 px-1.5 text-red-900 flex items-center justify-center" onClick={hideNotification}>
+        <button className="ml-2 pl-1.5 text-slate-50 flex items-center justify-center" onClick={hideNotification}>
           <FontAwesomeIcon icon={icon({ name: 'xmark' })} className="text-xl" />
         </button>
       </div>

@@ -8,11 +8,16 @@ export const useNotification = () => {
 
 export const NotificationProvider = ({ children }) => {
   const [errorMessage, setErrorMessage] = useState('');
+  const [infoMessage, setInfoMessage] = useState('');
   const [successMessage, setSuccessMessage] = useState('');
   const [warningMessage, setWarningMessage] = useState('');
 
   const showErrorMessage = (message) => {
     setErrorMessage(message);
+  };
+
+  const showInfoMessage = (message) => {
+    setInfoMessage(message);
   };
 
   const showSuccessMessage = (message) => {
@@ -25,6 +30,7 @@ export const NotificationProvider = ({ children }) => {
 
   const hideNotification = () => {
     setErrorMessage('');
+    setInfoMessage('');
     setSuccessMessage('');
     setWarningMessage('');
   };
@@ -33,9 +39,11 @@ export const NotificationProvider = ({ children }) => {
     <NotificationContext.Provider
       value={{
         errorMessage,
+        infoMessage,
         warningMessage,
         successMessage,
         showErrorMessage,
+        showInfoMessage,
         showSuccessMessage,
         showWarningMessage,
         hideNotification,

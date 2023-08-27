@@ -2,6 +2,7 @@ import React from 'react';
 import { Routes, Route, Navigate } from 'react-router-dom';
 
 import ErrorNotification from './components/notifications/ErrorNotification';
+import InfoNotification from './components/notifications/InfoNotification';
 import SuccessNotification from './components/notifications/SuccessNotification';
 import WarningNotification from './components/notifications/WarningNotification';
 
@@ -14,6 +15,7 @@ function App() {
   return (
     <div className="App">
       <ErrorNotification/>
+      <InfoNotification/>
       <SuccessNotification/>
       <WarningNotification/>
       <Routes>

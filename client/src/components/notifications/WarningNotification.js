@@ -26,16 +26,16 @@ const WarningNotification = () => {
 
   return (
     <div
-      className="bg-orange-500 p-4 rounded-lg border border-orange-700 shadow-md absolute backdrop-blur-sm top-8 right-8"
+    className="absolute top-8 right-8 py-3 px-4 bg-amber-800 rounded-xl"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex items-center justify-between">
-        <div className='text-orange-800'>
+        <div className='text-slate-50'>
           <h4 className="font-semibold">Warning</h4>
-          <p className="">{warningMessage}</p>
+          <p className="-mt-1">{warningMessage}</p>
         </div>
-        <button className="mt-0.5 ml-2 px-1.5 text-orange-900 flex items-center justify-center" onClick={hideNotification}>
+        <button className="ml-2 pl-1.5 text-slate-50 flex items-center justify-center" onClick={hideNotification}>
           <FontAwesomeIcon icon={icon({ name: 'xmark' })} className="text-xl" />
         </button>
       </div>
