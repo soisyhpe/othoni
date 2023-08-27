@@ -1,18 +1,26 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useLocation } from 'react-router-dom';
 
 const Breadcrumb = () => {
+  const location = useLocation();
+  const pathSegments = location.pathname.split('/').filter(segment => segment !== '');
+
   return (
     <div className='bg-custom-dark'>
-      {/* Server cards */}
       <div className='mx-auto lg:py-4 lg:px-8 max-w-7xl'>
-          <nav className="flex">
-            <Link to="/" className="text-white">
-              Home
-            </Link>
-            <span className="mx-2 text-white">/</span>
-            <span className="text-gray-400">Servers</span>
-          </nav>
+        <nav className="flex">
+          <Link to="/" className="text-white">
+            Home
+          </Link>
+          {pathSegments.map((segment, index) => (
+            <React.Fragment key={index}>
+              <span className="mx-2 text-white">/</span>
+              <Link to={`/${segment}`} className="text-white">
+                {segment}
+              </Link>
+            </React.Fragment>
+          ))}
+        </nav>
       </div>
     </div>
   );
