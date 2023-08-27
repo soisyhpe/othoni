@@ -47,7 +47,7 @@ const Header = () => {
             <div className="ml-4 relative">
               <FontAwesomeIcon className='absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-400' icon={icon({name: 'search'})} />
               <input
-                className="bg-custom-dark border border-custom-border rounded-lg border border-custom-border p-2 pl-10 font-regular text-gray-400"
+                className="outline-none bg-custom-dark border border-custom-border rounded-lg border border-custom-border p-2 pl-10 font-regular text-gray-400"
                 type="text"
                 placeholder="Search for a server"
                 value={searchValue}
