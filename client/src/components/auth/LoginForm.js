@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import AuthServices from '../../services/AuthServices';
 
 import Button from '../common/Button';
+import ErrorNotification from '../notifications/ErrorNotifications';
 
 import '../../styles/custom.css';
 
@@ -47,6 +48,10 @@ const LoginForm = () => {
     }
   }
 
+  const handleNotificationClose = () => {
+    setErrorMessage('');
+  };
+
   useEffect(() => {
     const authToken = Cookies.get('authToken');
     
@@ -81,14 +86,16 @@ const LoginForm = () => {
       <form onSubmit={formik.handleSubmit}>
 
         <div className="mb-8">
-          <h2 className="text-2xl font-bold">Sign in</h2>
+          <h1 className="text-2xl font-bold">Sign in</h1>
           <p className="text-base font-regular">Enter your account details.</p>
         </div>
 
         <div className="flex flex-col">
           <label className="mb-2 text-base font-bold" htmlFor="username">Email or username</label>
           <input
-            className="pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full"
+            className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
+              formik.touched.username && formik.errors.username ? 'border-red-500' : ''
+            }`}
             type="text"
             id="username"
             name="username"
@@ -105,8 +112,10 @@ const LoginForm = () => {
           <label className="mt-4 mb-2 text-base font-bold" htmlFor="password">Password</label>
           <div className="relative w-full">
             <input
-              className="pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full"
-              type={showPassword ? 'text' : 'password'} // Utilisation de l'état pour déterminer le type d'input
+              className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
+                formik.touched.password && formik.errors.password ? 'border-red-500' : ''
+              }`}
+              type={showPassword ? 'text' : 'password'}
               id="password"
               name="password"
               onChange={formik.handleChange}
@@ -116,7 +125,7 @@ const LoginForm = () => {
             <button
               className="font-semibold absolute top-1/2 right-4 transform -translate-y-1/2"
               type="button"
-              onClick={() => setShowPassword(!showPassword)} // Inversion de l'état au clic
+              onClick={() => setShowPassword(!showPassword)}
             >
               {showPassword ? 'Hide' : 'Show'}
             </button>
@@ -142,7 +151,9 @@ const LoginForm = () => {
         <Button onSubmit={formik.onSubmit} type='submit'>Sign in</Button>
       </form>
       
-      {errorMessage && <div className="text-base text-custom-red">{errorMessage}</div>}
+      {errorMessage && (
+        <ErrorNotification message={errorMessage} onClose={handleNotificationClose} />
+      )}
     </div>
   )
 };

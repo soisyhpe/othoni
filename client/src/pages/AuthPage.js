@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import LoginForm from '../components/auth/LoginForm';
 import RegisterForm from '../components/auth/RegisterForm';
+
 import '../styles/custom.css';
 
 const AuthPage = () => {
@@ -14,6 +15,7 @@ const AuthPage = () => {
     <div className="bg-custom-dark">
       <div className="flex justify-center items-center h-screen">
         <div className="w-full max-w-lg">
+          {/* Formulaire de connexion ou d'enregistrement */}
           <div className="bg-custom-dark border border-custom-border rounded-3xl shadow px-12 py-12 text-white">
             {showLoginForm ? <LoginForm /> : <RegisterForm />}
             

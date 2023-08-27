@@ -5,6 +5,7 @@ import AuthServices from '../../services/AuthServices';
 
 import LoginForm from '../auth/LoginForm';
 import Button from '../common/Button';
+import ErrorNotification from '../notifications/ErrorNotifications';
 
 const RegisterForm = () => {
   const [redirectToLogin, setRedirectToLogin] = useState(false);
@@ -44,6 +45,10 @@ const RegisterForm = () => {
     setSubmitting(false);
   }
 
+  const handleNotificationClose = () => {
+    setErrorMessage('');
+  };
+
   const formik = useFormik({
     initialValues,
     validationSchema,
@@ -65,7 +70,9 @@ const RegisterForm = () => {
           <div className="flex flex-col">
             <label className="mb-2 text-base font-bold" htmlFor="username">Email or username</label>
             <input
-              className="pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full"
+              className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
+                formik.touched.username && formik.errors.username ? 'border-red-500' : ''
+              }`}
               type="text"
               id="username"
               name="username"
@@ -82,7 +89,9 @@ const RegisterForm = () => {
             <label className="mt-4 mb-2 text-base font-bold" htmlFor="password">Password</label>
             <div className="relative w-full">
               <input
-                className="pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full"
+                className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
+                  formik.touched.password && formik.errors.password ? 'border-red-500' : ''
+                }`}
                 type={showPassword ? 'text' : 'password'}
                 id="password"
                 name="password"
@@ -98,15 +107,17 @@ const RegisterForm = () => {
                 {showPassword ? 'Hide' : 'Show'}
               </button>
             </div>
-            {formik.touched.password && formik.errors.password ? (
+            {formik.touched.password && formik.errors.password && (
               <div className="text-base text-custom-red">{formik.errors.password}</div>
-            ) : null}
+            )}
           </div>
 
           <div className="flex flex-col mb-2">
             <label className="mt-4 mb-2 text-base font-bold" htmlFor="confirmPassword">Confirm Password</label>
             <input
-              className="pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full"
+              className={`pl-4 bg-custom-darker border border-custom-border rounded-lg h-14 w-full ${
+                formik.touched.confirmPassword && formik.errors.confirmPassword ? 'border-red-500' : ''
+              }`}
               type='password'
               id="confirmPassword"
               name="confirmPassword"
@@ -114,14 +125,17 @@ const RegisterForm = () => {
               onBlur={formik.handleBlur}
               value={formik.values.confirmPassword}
             />
-            {formik.touched.confirmPassword && formik.errors.confirmPassword ? (
+            {formik.touched.confirmPassword && formik.errors.confirmPassword && (
               <div className="text-base text-custom-red">{formik.errors.confirmPassword}</div>
-            ) : null}
+            )}
           </div>
           
           <Button type="submit" disabled={formik.isSubmitting}>Register</Button>
         </form>
-        {errorMessage && <div className="text-base text-custom-red">{errorMessage}</div>}
+        
+        {errorMessage && (
+          <ErrorNotification message={errorMessage} onClose={handleNotificationClose} />
+        )}
       </div>
     )
   );
