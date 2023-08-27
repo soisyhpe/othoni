@@ -1,8 +1,13 @@
 import React from 'react';
-import { useLocation } from 'react-router-dom';
+import { useLocation, useNavigate } from 'react-router-dom';
 
 const NotFound = () => {
   const location = useLocation();
+  const navigate = useNavigate();
+
+  const handleBackToHomeButton = () => {
+    navigate('/home')
+  };
 
   return (
     <div className="bg-custom border border-custom-border rounded-3xl shadow px-12 py-12 text-white">
@@ -15,7 +20,7 @@ const NotFound = () => {
               <span className="text-white">
                 Wrong way?
               </span>
-              <button className="text-blue-600 hover:underline ml-1">
+              <button className="text-blue-600 hover:underline ml-1" onClick={handleBackToHomeButton}>
                 Back to home
               </button>
             </div>
