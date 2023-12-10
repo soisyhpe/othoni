@@ -51,11 +51,13 @@ const HomePage = () => {
 
       {/* Content */}
       <div className='bg-custom-dark flex-grow'>
-        {/* Server cards */}
         <div className='mx-auto lg:px-8 max-w-7xl grid md:grid-cols-2 gap-8'>
+
+          {/* Server cards */}
           {servers.map((server, index) => (
             <Server key={index} server={server} />
           ))}
+          
         </div>
       </div>
 

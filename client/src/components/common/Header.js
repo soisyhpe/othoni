@@ -1,18 +1,19 @@
-import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import React, { useState, useEffect } from 'react';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 
 import { useNotification } from '../context/NotificationContext';
 import ActionButton from '../buttons/ActionButton';
 import NavigationButton from '../buttons/NavigationButton';
 
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, icon } from '@fortawesome/fontawesome-svg-core/import.macro';
+import { icon } from '@fortawesome/fontawesome-svg-core/import.macro';
 
 const Header = () => {
+  const [searchValue, setSearchValue] = useState('');
+  const [activeButton, setActiveButton] = useState(null);
   const { showErrorMessage } = useNotification();
   const navigate = useNavigate();
-
-  const [searchValue, setSearchValue] = useState('');
+  const location = useLocation();
 
   const handleHomeClick = () => {
     navigate('/home');
@@ -26,6 +27,17 @@ const Header = () => {
     showErrorMessage('This feature will be available soon.');
   };
 
+  // Determine the active button based on the current route
+  useEffect(() => {
+    if (location.pathname === '/home') {
+      setActiveButton('home');
+    } else if (location.pathname === '/manager') {
+      setActiveButton('manager');
+    } else {
+      setActiveButton('');
+    }
+  }, [location.pathname]);
+
   return (
     <header className='bg-custom-dark'>
       <div className='rounded-b-3xl border-b border-custom-border'>
@@ -36,11 +48,11 @@ const Header = () => {
               <img className="h-8 w-auto" src={require("../../othoni.svg").default} alt="" />
             </a>
 
-            <NavigationButton onClick={handleHomeClick}>
+            <NavigationButton onClick={handleHomeClick} active={activeButton === 'home'}>
               Home
             </NavigationButton>
 
-            <NavigationButton onClick={handleManagerClick}>
+            <NavigationButton onClick={handleManagerClick} active={activeButton === 'manager'}>
               Manager
             </NavigationButton>
 
