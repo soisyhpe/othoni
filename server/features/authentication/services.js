@@ -8,8 +8,13 @@ const AuthenticationServices = {
 
   async generateToken(userId) {
     try {
-      const token = jwt.sign({ userId }, process.env.SECRET_KEY, { expiresIn: '1h' });
-      return token;
+      const expiresIn = '1h';
+      const token = jwt.sign({ userId }, process.env.SECRET_KEY, { expiresIn });
+
+      const expirationTimestamp = Math.floor(Date.now() / 1000) + parseInt(expiresIn, 10);
+      const expirationDate = new Date(expirationTimestamp * 1000).toISOString();
+  
+      return { token, expirationDate: expirationDate };
     } catch (error) {
       logger.error('Error generating JWT token.');
       logger.debug(`Error details:`, error);
