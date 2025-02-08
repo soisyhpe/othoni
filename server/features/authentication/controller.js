@@ -1,9 +1,9 @@
 const { body, param } = require('express-validator');
 const bcrypt = require('bcrypt');
+const { validationResult } = require('express-validator');
 const logger = require('../../middleware/logger');
-const { validationCheck } = require('../../middleware/validation');
-const AuthenticationService = require('./services');
 const { USER_PASSWORD_REGEX } = require('../../utils/constantsAndFunctions');
+const AuthenticationService = require('./services');
 
 const {
   HTTP_STATUS
@@ -22,9 +22,13 @@ const AuthenticationController = {
   ],
 
   async registerUser(req, res) {
-    const { username, password } = req.body;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      console.log(`Error details:`, errors.array());
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ errors: errors.array() });
+    }
 
-    validationCheck(req, res);
+    const { username, password } = req.body;
 
     try {
       await AuthenticationService.createUser(username, password);
@@ -47,13 +51,15 @@ const AuthenticationController = {
   deleteUserValidations: [
     param('username')
       .notEmpty().withMessage('Username is required')
-      .isLength({ min: 3, max: 16 }).withMessage('Username must be between 3 and 16 characters')
   ],
 
   async deleteUser(req, res) {
-    const username = req.params.username;
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ errors: errors.array() });
+    }
 
-    validationCheck(req, res);
+    const username = req.params.username;
 
     try {
       const result = await AuthenticationService.deleteUser(username);
@@ -71,7 +77,10 @@ const AuthenticationController = {
   },
 
   async getUsers(req, res) {
-    validationCheck(req, res);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ errors: errors.array() });
+    }
 
     const offset = req.params.offset || 0;
     const limit = req.params.limit || 10;
@@ -87,17 +96,18 @@ const AuthenticationController = {
   },
 
   // Validation des données pour la connexion d'un utilisateur
-  loginUserValidations: [
+  loginValidationRules: [
     body('username')
-      .notEmpty().withMessage('Username is required')
-      .isLength({ min: 3, max: 16 }).withMessage('Username must be between 3 and 16 characters'),
+      .notEmpty().withMessage('Username is required'),
     body('password')
       .notEmpty().withMessage('Password is required')
-      .matches(USER_PASSWORD_REGEX).withMessage('Password must be at least 8 characters long and contain at least one digit, one lowercase letter, and one uppercase letter')
   ],
 
   async loginUser(req, res) {
-    validationCheck(req, res);
+    const errors = validationResult(req);
+    if (!errors.isEmpty()) {
+      return res.status(HTTP_STATUS.BAD_REQUEST).json({ errors: errors.array() });
+    }
 
     const { username, password } = req.body;
     logger.info(`User '${username}' is logging in...`);
@@ -105,16 +115,24 @@ const AuthenticationController = {
     try {
       const user = await AuthenticationService.findUserByUsername(username);
 
-      if (!user || !bcrypt.compare(password, user.password)) {
-        res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'Invalid credentials' });
+      if (!user) {
+        logger.error(`Username not found: ${username}`);
+        res.status(HTTP_STATUS.NOT_FOUND).json({ message: 'Username not found' });
+        return;
+      }
+      
+      if (!bcrypt.compare(password, user.hashedPassword)) {
+        logger.error(`Incorrect password for username: ${username}`);
+        res.status(HTTP_STATUS.UNAUTHORIZED).json({ message: 'Incorrect password' });
         return;
       }
 
-      const token = await AuthenticationService.generateToken(user._id);
+      const tokenData = await AuthenticationService.generateToken(user._id);
       logger.info(`Login successful for username: ${username}`);
-      res.status(HTTP_STATUS.OK).json({ token });
+      res.status(HTTP_STATUS.OK).json(tokenData);
+
     } catch (error) {
-      logger.warn(`Login failed for username: ${username}`);
+      logger.error(`Login failed for username: ${username}`);
       logger.debug(`Error details:`, error);
       res.status(HTTP_STATUS.INTERNAL_SERVER_ERROR).json({ message: 'Failed to authenticate' });
     }

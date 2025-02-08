@@ -1,15 +1,13 @@
-const express = require('express');
-const ServerController = require('./controller');
+import { Router } from 'express';
+import { addServerValidations, addServer, deleteServerValidations, deleteServer, getServers, getServerValidations, getServer } from './controller';
 
-const {
-  verifyToken
-} = require('../../middleware/token');
+import { verifyToken } from '../../middleware/token';
 
-const router = express.Router();
+const router = Router();
 
-router.post('', [verifyToken, ServerController.addServerValidations], ServerController.addServer);
-router.delete('/:server_address_with_port', [verifyToken, ServerController.deleteServerValidations], ServerController.deleteServer);
-router.get('', [verifyToken], ServerController.getServers);
-router.get('/:server_address_with_port', [verifyToken, ServerController.getServerValidations], ServerController.getServer);
+router.post('', [verifyToken, addServerValidations], addServer);
+router.delete('/:server_address_with_port', [verifyToken, deleteServerValidations], deleteServer);
+router.get('', [verifyToken], getServers);
+router.get('/:server_address_with_port', [verifyToken, getServerValidations], getServer);
 
-module.exports = router;
+export default router;
